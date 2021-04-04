@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="/css/all.min.css">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100" onload="init()">
+    <%include ../../header_admin %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">글쓰기</h1>
+                <form action="/admin/coupon" method="post" id="boardwriteForm" autocomplete="off" novalidate>
+                    <table class="table">
+                        <tr>
+                            <td>
+                                <label for="title_input">제목<span class="require">*</span></label>
+                            </td>
+                            <td>
+                                <input type="text" name="title" id="title_input" class="form-control" />
+                                <div class="valid-feedback"></div>
+                                <div class="invalid-feedback"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="content_input">내용</label>
+                            </td>
+                            <td>
+                                <textarea name="description" class="form-control" id="content_input"></textarea>
+                                <div class="valid-feedback"></div>
+                                <div class="invalid-feedback"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="content_input">쿠폰번호</label>
+                            </td>
+                            <td>
+                                <input type="text" name="cou_num" id="cou_num_input" class="form-control" />
+                                <div class="valid-feedback"></div>
+                                <div class="invalid-feedback"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                만료 날짜
+                            </td>
+                            <td>
+                                <div class="input-group date" id="expire_date_input" data-target-input="nearest">
+                                    <input type="text" name="expire_date" class="form-control datetimepicker-input" data-target="#expire_date_input"/>
+                                    <div class="input-group-append" data-target="#expire_date_input" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div>
+                        <input type="button" value="글쓰기" id="writeBtn" class="btn btn-primary" />
+                    </div>
+                </form>
+                <script src="/js/jquery.min.js"></script>
+                <script src="/javascripts/valid.js"></script>
+                <script src="/js/bs-custom-file-input.min.js"></script>
+                <script src="/javascripts/moment-with-locales.min.js"></script>
+                <script src="/js/all.min.js"></script>
+                <script src="/javascripts/tempusdominus-bootstrap-4.min.js"></script>
+                <script>
+                    $(function () {
+                        $('#expire_date_input').datetimepicker({
+                            //format: 'L',
+                            format: 'YYYY-MM-DD',
+                            dayViewHeaderFormat: 'YYYY[년] MMMM',
+                            locale: 'ko',
+                            minDate: moment()
+                        });
+                        $("#start_date_input").on("change.datetimepicker", function (e) {
+                            $('#end_date_input').datetimepicker('minDate', e.date);
+                        });
+                        $("#end_date_input").on("change.datetimepicker", function (e) {
+                            $('#start_date_input').datetimepicker('maxDate', e.date);
+                        });
+                    });
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        bsCustomFileInput.init();
+                    });
+                </script>
+                <script>
+                    //자바스크립트 유효성검사부분 넣어야함
+                    $("#title_input").focusout(function() {
+                        boardtitle_valid($(this));
+                    });
+
+                    $("#content_input").focusout(function() {
+                        boardcontent_valid($(this));
+                    });
+
+                    $("#writeBtn").click(function(e) {
+                        $("#boardwriteForm").submit();
+                    });
+                </script>
+                <script type="text/javascript">
+                    var observe;
+                    if (window.attachEvent) {
+                        observe = function(element, event, handler) {
+                            element.attachEvent('on' + event, handler);
+                        };
+                    }
+                    else {
+                        observe = function(element, event, handler) {
+                            element.addEventListener(event, handler, false);
+                        };
+                    }
+
+                    function init() {
+                        //var text = document.getElementById('text');
+
+                        var text = document.getElementById('content_input');
+
+                        //var text = $(".comment-input");
+                        function resize() {
+                            text.style.height = 'auto';
+                            var maxheight = 400;
+                            if(text.scrollHeight >= maxheight) {
+                                text.style.overflowY="scroll";
+                                text.style.height = maxheight + 'px';
+                            } else {
+                                text.style.overflow="hidden";
+                                text.style.height = text.scrollHeight + 'px';
+                            }
+                        }
+                        /* 0-timeout to get the already changed text */
+                        function delayedResize() {
+                            window.setTimeout(resize, 0);
+                        }
+                        observe(text, 'change', resize);
+                        observe(text, 'cut', delayedResize);
+                        observe(text, 'paste', delayedResize);
+                        observe(text, 'drop', delayedResize);
+                        observe(text, 'keydown', delayedResize);
+
+                        /*text.focus();
+                        text.select();*/
+                        resize();
+                    }
+                </script>
+            </div>
+        </main>
+
+        <%include ../../footer %>
+
+</body>
+
+</html>

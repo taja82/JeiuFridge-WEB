@@ -1,0 +1,202 @@
+<header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="/">재능냉장고</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/stock">재고확인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/event">이벤트</a>
+                </li>
+                <%if(user != undefined) {%>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/coupon">쿠폰함</a>
+                    </li>
+                    <%}%>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/notice">공지사항</a>
+                        </li>
+            </ul>
+            <div>
+                <ul class="navbar-nav">
+                    <%if(user != undefined) {%>
+                        <li class="nav-item text-nowrap">
+                                <a class="nav-link" href="/cart">장바구니</a>
+                            </li>
+                        <%if(user.is_admin == true) {%>
+                            <li class="nav-item text-nowrap">
+                                <a class="nav-link" href="/admin/user">관리</a>
+                            </li>
+                            <%}%>
+                                <li class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" id="logininfo_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <%=user.name%>님</a>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="logininfo_dropdown">
+                                        <div id="userinfo">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" class="rounded-circle" style="width:60px" alt="user image">
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="button" class="btn btn-primary" id="userinfo_btn">회원정보 수정</button>
+                                        <button type="button" class="btn btn-primary" id="logout_btn">로그아웃</button>
+                                    </div>
+                                </li>
+                                <script>
+                                    $("#logout_btn").click(function() {
+                                        location.href = "/users/logout";
+                                    });
+                                    $("#logout_btn").click(function(e) {
+                                            $.ajax({
+                                                url: '/users/logout',
+                                                type: 'get',
+                                                complete: function(response) {
+                                                    console.log(response);
+                                                    location.reload(true);
+                                                    // 성공하든 실패하든 항상 할 동작
+                                                }
+                                            });
+                                        });
+                                    $("#userinfo_btn").click(function() {
+                                        location.href = "/users/userinfo";
+                                    });
+                                </script>
+                                <%} else {%>
+                                    <!--<li class="nav-item text-nowrap">
+                                        <a href="#" class="nav-link" id="login_btn">로그인</a>
+                                    </li>-->
+                                    <li class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="logininfo_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">로그인</a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <form class="px-4 py-3" method="post" id="loginForm" autocomplete="off" action="/users/login" novalidate>
+                                                <div class="form-group">
+                                                    <label for="id_input">아이디<span class="require">*</span></label>
+                                                    <input type="text" name="username" id="id_input" class="form-control" />
+                                                    <div class="valid-feedback"></div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="password_input">비밀번호<span class="require">*</span></label>
+                                                    <input type="password" name="password" id="password_input" class="form-control" />
+                                                    <div class="valid-feedback"></div>
+                                                    <div class="invalid-feedback"></div>
+                                                </div>
+                                                <div class="form-group form-check">
+                                                    <input type="checkbox" class="form-check-input" id="saveid">
+                                                    <label class="form-check-label" for="saveid">아이디 저장</label>
+                                                </div>
+                                                <button type="button" class="btn btn-primary" id="loginBtn">로그인</button>
+                                            </form>
+                                            <div class="dropdown-divider"></div>
+                                            <div class="dropdown-item">새로운 회원이 되실려고요? <a href="/users/register">회원가입</a></div>
+                                            <div class="dropdown-item">로그인을 할 수 없으신가요?<a href="/users/find">비밀번호 재설정</a></div>
+                                        </div>
+                                    </li>
+                                    <script>
+                                        $("#password_input").on("keyup", function(e) {
+                                            if (e.originalEvent.getModifierState("CapsLock")) {
+                                                $(this).siblings(".invalid-feedback").text("CapsLock이 켜져있습니다.");
+                                                $(this).removeClass("is-valid").addClass("is-invalid");
+                                            }
+                                            else {
+                                                $(this).removeClass("is-invalid");
+                                            }
+                                        })
+
+                                        var id = getCookie("savedid");
+                                        $("#loginBtn").click(function(e) {
+                                            setCookie("savedid", $("#id_input").val(), 30);
+                                            //$("#loginForm").attr("action", "./login").submit();
+                                            $.ajax({
+                                                url: '/users/login',
+                                                type: 'post',
+                                                /*data: {
+                                                    // 보낼 데이터
+                                                    username:$('#usernameField').text(),
+                                                    password:$('#passwordField').text()
+                                                },*/
+                                                data: $("#loginForm").serialize(),
+                                                dataType: 'json',
+                                                success: function(response) {
+                                                    // 성공 시 동작
+                                                    //alert("로그인에 성공하였습니다.");
+                                                    //location.href = "../"
+                                                    location.reload(true);
+                                                },
+                                                error: function(error) {
+                                                    // 실패 시 동작
+                                                    //alert("로그인에 실패하였습니다");
+                                                    console.log(error.responseJSON.SERVER_MESSAGE);
+                                                    alert(error.responseJSON.SERVER_MESSAGE);
+                                                },
+                                                complete: function(response) {
+                                                    console.log(response);
+                                                    // 성공하든 실패하든 항상 할 동작
+                                                }
+                                            });
+                                        });
+
+                                        $(document).ready(function() {
+                                            var id = getCookie("savedid");
+                                            if (id != "") {
+                                                $("#id_input").val(id);
+                                                $("#saveid").attr("checked", true);
+                                            }
+
+                                            $("#saveid").change(function() {
+                                                if ($(this).is(":checked")) {
+                                                    id = $("#id_input").val();
+                                                }
+                                                else {
+                                                    deleteCookie("savedid");
+                                                }
+                                            })
+                                        })
+
+                                        function setCookie(cookieName, value, exdays) {
+                                            var exdate = new Date();
+                                            exdate.setDate(exdate.getDate() + exdays);
+                                            var cookieValue = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toGMTString());
+                                            document.cookie = cookieName + "=" + cookieValue;
+                                        }
+
+                                        function deleteCookie(cookieName) {
+                                            var expireDate = new Date();
+                                            expireDate.setDate(expireDate.getDate() - 1);
+                                            document.cookie = cookieName + "= " + "; expires=" + expireDate.toGMTString();
+                                        }
+
+                                        function getCookie(cookieName) {
+                                            cookieName = cookieName + '=';
+                                            var cookieData = document.cookie;
+                                            var start = cookieData.indexOf(cookieName);
+                                            var cookieValue = '';
+                                            if (start != -1) {
+                                                start += cookieName.length;
+                                                var end = cookieData.indexOf(';', start);
+                                                if (end == -1) end = cookieData.length;
+                                                cookieValue = cookieData.substring(start, end);
+                                            }
+                                            return unescape(cookieValue);
+                                        }
+                                    </script>
+                                    </script>
+                                    <%}%>
+                </ul>
+
+
+                <script>
+                    $(".dropdown-item").click(function() {
+                        event.stopPropagation();
+                    });
+                    /*$("#login_btn").click(function() {
+                        location.href = "/users/login";
+                    });*/
+                </script>
+            </div>
+        </div>
+    </nav>
+</header>

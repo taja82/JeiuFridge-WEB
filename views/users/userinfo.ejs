@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">회원정보 수정</h1>
+                <form action="./register" method="post" id="usermodForm" autocomplete="off" novalidate>
+                    <input type="hidden" name="num" id="num_input" <%if(result.num !=undefined) {%> value="<%=result.num%>"<%}%>>
+                    <div class="form-group">
+                        <label for="studentid_input">학번<span class="require">*</span></label>
+                        <input type="number" name="student_id" id="studentid_input" class="form-control" min="0" <%if(result.student_id !=undefined) {%> value="<%=result.student_id%>"<%}%> />
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_input">아이디<span class="require">*</span></label>
+                        <input type="text" name="id" id="id_input" class="form-control" disabled <%if(result.id !=undefined) {%> value="<%=result.id%>"<%}%> />
+                        <div class="valid-feedback flex-grow-0"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email_input">이메일</label>
+                        <input type="email" name="email" id="email_input" class="form-control" <%if(result.email !=undefined) {%> value="<%=result.email%>"<%}%>/>
+                        <small id="emailHelp" class="form-text text-muted">이메일은 비밀번호를 잊어버렸을 경우에 찾을 수 있도록 합니다.</small>
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_input">비밀번호</label>
+                        <input type="password" name="password" id="password_input" class="form-control" />
+                        <small id="emailHelp" class="form-text text-muted">비밀번호는 8~20자, 공백 미포함, 영어,숫자,특수문자 3가지 중 2가지가 포함되어야 합니다.</small>
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordr_input">비밀번호 확인</label>
+                        <input type="password" name="passwordr" id="passwordr_input" class="form-control" />
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name_input">이름</label>
+                        <input type="text" name="name" id="name_input" class="form-control" <%if(result.name !=undefined) {%> value="<%=result.name%>"<%}%>/>
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div>
+                        <input type="button" value="수정" id="modUserBtn" class="btn btn-primary" />
+                    </div>
+                </form>
+                <script src="../javascripts/valid.js"></script>
+                <script>
+                    //자바스크립트 유효성검사부분 넣어야함
+                    $("#studentid_input").focusout(function() {
+                        studentid_valid($(this));
+                    });
+                    
+                    //아이디 임시규정. 5자에서 15자 가능. 알파벳, 숫자, 특수문자(_) 가능
+                    $("#id_input").focusout(function() {
+                        id_valid($(this));
+                    });
+
+                    $("#email_input").on("propertychange change keyup paste input", function() {
+                        email_valid($(this));
+                    });
+                    //임시로 정한 비밀번호 규정. 비밀번호 길이 8~20자. 공백문자 없이, 영문,숫자,특수문자 중 2가지 이상 혼합하여 사용.
+                    $("#password_input").on("propertychange change keyup paste input", function() {
+                        password_valid($(this));
+                    });
+                    $("#passwordr_input").on("propertychange change keyup paste input", function() {
+                        passwordr_valid($("#password_input"), $(this))
+                    });
+
+                    $("#modUserBtn").click(function(e) {
+                        console.log(true);
+                        submit_helper($("#usermodForm"), "/users/userinfo/" + $("#num_input").val(), "put", undefined);
+                    });
+                    function submit_helper(formobj, action, method, data) {
+                        if(method == "put" || method == "delete") {
+                            //document.createElement()
+                            //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                            action += "/?_method=" + method;
+                            method = "post";
+                        }
+                        
+                        formobj.attr({"action" : action, 'method' : method});
+                        console.log(action);
+                        formobj.submit();
+                    }
+                </script>
+            </div>
+        </main>
+
+        <%include ../footer %>
+
+</body>
+
+</html>

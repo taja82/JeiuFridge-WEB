@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    </style>
+    <script src="js/Chart.min.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header_admin %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">관리자페이지</h1>
+                회원 가입수
+                <canvas id="myChart" width="400" height="100"></canvas>
+            </div>
+        </main>
+        <script src="/js/dayjs.min.js"></script>
+        <script>
+            function Ajax(url, type = "get", data, callback) {
+                var result;
+                $.ajax({
+                    url: url,
+                    type: type,
+                    data: data,
+                    success: function(response) {
+                        result = response;
+                    },
+                    error: function(error) {
+                        result = error.responseJSON;
+                        console.error(error);
+                    },
+                    complete: function() {
+                        if (typeof callback === "function") {
+                            callback(result);
+                        }
+                    },
+                });
+            }
+            $(document).ready(function() {
+                Ajax("/api/admin/memberinfo_d", "get", undefined, function(result) {
+                    var ctx = document.getElementById('myChart');
+                    var dates = [];
+                    var datas = [];
+                    for(var key in result.result) {
+                        console.log(key);
+                        dates.push(dayjs(result.result[key]["date"]).format("YYYY-MM-DD"));
+                        datas.push(result.result[key]["count"]);
+                    }
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                data: datas,
+                                lineTension: 0,
+                                backgroundColor: 'transparent',
+                                borderColor: '#007bff',
+                                borderWidth: 4,
+                                pointBackgroundColor: '#007bff'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: false,
+                                        stepSize:1
+                                    }
+                                }]
+                            },
+                            legend: {
+                                display: false
+                            }
+                        }
+                    })
+                })
+            })
+        </script>
+        <%include ../footer %>
+</body>
+
+</html>

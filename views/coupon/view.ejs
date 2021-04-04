@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5"></h1>
+                <!--<img id="barcode" class="img-fluid w-100" alt="coupon barcode image"/>-->
+                <img id="qrcode" class="img-fluid w-100" alt="coupon qrcode image" src="<%=qrUrl%>"/>
+            </div>
+        </main>
+        <!--<script src="/js/JsBarcode.all.min.js"></script>
+        <script>
+            $("#barcode").JsBarcode("<%=result.cou_num%>",{width:4});
+        </script>-->
+        <%include ../footer %>
+
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+<script>
+    <%if(msg) {%>
+        alert("<%=msg%>");
+    <%}%>
+    
+    <%if(redirectUrl != undefined && redirectUrl != null) {%>
+        window.location.replace("<%=redirectUrl%>");
+    <%} else {%>
+        history.go(-1);
+    <%}%>
+</script>

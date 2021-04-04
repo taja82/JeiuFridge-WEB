@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/all.css"></link>
+    <style>
+        img {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">재고조회</h1>
+                <table class="table">
+                    <tr>
+                        <td>
+                            <label for="title_input">이름</label>
+                        </td>
+                        <td>
+                            <%=result.name%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="content_input">설명</label>
+                        </td>
+                        <td>
+                            <%=result.description%>
+                        </td>
+                    </tr>
+                    <%if(result.brand) {%>
+                        <tr>
+                            <td>
+                                <label for="content_input">브랜드</label>
+                            </td>
+                            <td>
+                                <%=result.brand%>
+                            </td>
+                        </tr>
+                        <%}%>
+                            <tr>
+                                <td>
+                                    <label for="content_input">가격</label>
+                                </td>
+                                <td>
+                                    <%=result.price%>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="content_input">재고 갯수</label>
+                                </td>
+                                <td>
+                                    <%=result.stock%>
+                                </td>
+                            </tr>
+                            <%if(result.img_src != null) {%>
+                                <tr>
+                                    <td>이미지</td>
+                                    <td><img src="<%=result.img_src%>" /></td>
+                                </tr>
+                                <%}%>
+                </table>
+                <form action="/stock" method="post" id="boardviewForm">
+                    <% if(user != undefined && (result.uploader == user.name || user.is_admin == true)) {%>
+                        <input type="button" value="수정" id="modifyBtn" class="btn btn-dark" />
+                        <input type="button" value="삭제" id="deleteBtn" class="btn btn-danger" />
+                        <script>
+                            $("#deleteBtn").click(function() {
+                                var confirm_a = confirm("현재 게시물을 삭제합니다. 계속하시겠습니까?");
+                                if (confirm_a) {
+                                    submit_helper($("#boardviewForm"), "/stock/" + <%= result.num %> , "delete", undefined);
+                                }
+                            });
+                            $("#modifyBtn").click(function() {
+                                location.href = "/stock/" + <%= result.num %> +"/edit";
+                            });
+
+                            function submit_helper(formobj, action, method, data) {
+                                if (method == "put" || method == "delete") {
+                                    //document.createElement()
+                                    //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                                    action += "/?_method=" + method;
+                                    method = "post";
+                                }
+
+                                formobj.attr({ "action": action, 'method': method });
+                                formobj.submit();
+                            }
+                        </script>
+                        <%}%>
+                            <input type="button" value="목록" id="listBtn" class="btn btn-primary" />
+                            <%if(user != undefined) {%>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                    장바구니
+                                </button>
+                            <%}%>
+                            
+                </form>
+                
+            <%if(user != undefined) {%>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">장바구니</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="cartForm" autocomplete="off" novalidate>
+                                    <input type="hidden" name="stocknum" value="<%=result.num%>"/>
+                                    <div class="input-group inline-group">
+  <div class="input-group-prepend">
+    <button type="button" class="btn btn-outline-secondary btn-minus">
+      <i class="fa fa-minus"></i>
+    </button>
+  </div>
+  <input class="form-control quantity" min="0" max="<%=result.stock%>" name="quantity" value="1" type="number" style="text-align:center;">
+  <div class="input-group-append">
+    <button type="button" class="btn btn-outline-secondary btn-plus">
+      <i class="fa fa-plus"></i>
+    </button>
+  </div>
+</div>
+                                </form>
+                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="cartBtn" class="btn btn-primary">장바구니에 넣기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    $('.btn-plus, .btn-minus').on('click', function(e) {
+  const isNegative = $(e.target).closest('.btn-minus').is('.btn-minus');
+  const input = $(e.target).closest('.input-group').find('input');
+  if (input.is('input')) {
+    input[0][isNegative ? 'stepDown' : 'stepUp']()
+  }
+})
+$("#cartBtn").click(function(e) {
+                        //$("#boardmodifyForm").submit();
+                        submit_helper($("#cartForm"), "/cart", "post", undefined);
+                    });
+                </script>
+                <%}%>
+                <script>
+                    $("#listBtn").click(function() {
+                        location.href = "/stock";
+                    });
+                </script>
+                <script>
+                    function submit_helper(formobj, action, method, data) {
+                        if (method == "put" || method == "delete") {
+                            //document.createElement()
+                            //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                            action += "/?_method=" + method;
+                            method = "post";
+                        }
+
+                        formobj.attr({ "action": action, 'method': method });
+                        formobj.submit();
+                    }
+                    
+                    
+                </script>
+            </div>
+        </main>
+
+        <%include ../footer %>
+
+</body>
+
+</html>

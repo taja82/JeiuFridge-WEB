@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+        
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../../header_admin %>
+
+    <!-- Begin page content -->
+    <main role="main" class="flex-shrink-0">
+        <div class="container">
+            <h1 class="mt-5">유저 별 쿠폰 관리</h1>
+            <table class="table">
+                <thead>
+                    <td>번호</td>
+                    <td>쿠폰 이름</td>
+                    <td>쿠폰 설명</td>
+                    <td>쿠폰 번호</td>
+                    <td>발행자</td>
+                    <td>만료 일자</td>
+                    <td>생성 일자</td>
+                    <td>수여자</td>
+                    <td>얻은곳</td>
+                    <td>사용여부</td>
+                </thead>
+                <tbody>
+                <% for(var i=0; i<result.length; i++) {%>
+                    <tr>
+                        <td><%=i+1%></td>
+                        <td><%=result[i].title%></td>
+                        <td><%=result[i].description%></td>
+                        <td><%=result[i].cou_num%></td>
+                        <td><%=result[i].issue_from%></td>
+                        <td><%=result[i].expire_date%></td>
+                        <td><%=result[i].create_date%></td>
+                        <td><%=result[i].userid%></td>
+                        <td><%=result[i].get_from%></td>
+                        <td><%=result[i].is_used%></td>
+                    </tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <%include ../../footer %>
+</body>
+
+</html>

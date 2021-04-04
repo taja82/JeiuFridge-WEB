@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    .stockitem {
+        padding:0
+        position:relative;
+    }
+    .sold-out {
+        width:100%;
+        height:100%;
+        vertical-align:middle;
+        text-align:center;
+        color:red;
+        background-color:rgba(255,255,255,0.7);
+        position:absolute;
+    }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">재고확인</h1>
+                <%if(user != undefined) {%>
+                    <%if(user.is_admin == true) {%>
+                        <div><input type="checkbox" id="checkall"><label for="checkall">모두 선택</label></div>
+                    <%}%>
+                <%}%>
+                <div class="row">
+                    <%for(var i=0; i<result.length; i++) {%>
+                        <div class="col-6 col-md-4 col-lg-3 col-xl-2 d-flex justify-content-center stockitem">
+                            
+                            <div class="card" style="width: 12rem;" data-num=<%=result[i].num%>>
+                                <%if(result[i].stock <= 0) {%>
+                                    <div class="sold-out">
+                                        품절
+                                    </div>
+                                <%}%>
+                                
+                                <%if(user != undefined) {%>
+                                    <input type="checkbox" class="boardcheck">
+                                <%}%>
+                                <%if(result[i].img_src != undefined) {%>
+                                    <img src="<%=result[i].img_src%>" class="card-img-top" alt="..." style="height:200px;object-fit:contain">
+                                <%}%>
+                                <div class="card-body">
+                                    <h5 class="card-title"><%=result[i].title%></h5>
+                                    <p class="card-text">
+                                        <%if(result[i].brand != undefined && result[i].brand) {%>
+                                            <%=result[i].brand%>)
+                                        <%}%>
+                                        <div class="stock-name">
+                                            <%=result[i].name%>
+                                        </div>
+                                        <%if(result[i].price) {%>
+                                            <div class="stock-stocknum">
+                                                <%=result[i].price + "원"%>
+                                            </div>
+                                        <%}%>
+                                        <%if(result[i].stock) {%>
+                                            <div class="stock-stocknum">
+                                                <%=result[i].stock + "개"%>
+                                            </div>
+                                        <%}%>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <%}%>
+                </div>
+                    <%if(user != undefined) {%>
+                    <%if(user.is_admin == true) {%>
+                        <form method="post" id="boardForm">
+                            <button type="button" class="btn btn-primary" id="write_btn">글 작성</button>
+                            <button type="button" class="btn btn-danger" id="delete_btn">글 삭제</button>
+                        </form>
+                        <script>
+                            var board_del_array = [];
+                            $("#write_btn").click(function() {
+                                //$("#boardForm").attr({"action" : "notice/new","method" : "get"}).submit();
+                                submit_helper($("#boardForm"), "/stock/new", "get", undefined);
+                            });
+                            $("#delete_btn").click(function() {
+                                var array = [];
+                                $(".boardcheck").each(function(index, item) {
+                                    if(item.checked == true) {
+                                        //board_del_array.push($(this).parents(".board-row").data("num"));
+                                        array.push($(this).parents(".card").data("num"));
+                                    }
+                                });
+                                board_del_array = array;
+                                console.log(board_del_array);
+                                if(board_del_array.length != 0) {
+                                    var del_c = confirm(board_del_array.length + "개의 글을 삭제합니다. 계속하시겠습니까?");
+                                    if(del_c) {
+                                        //$("#boardFrom").attr({"action" : "notice/array/" + board_del_array, "method": "delete"}).submit();
+                                        submit_helper($("#boardForm"), "/stock/array/" + board_del_array, "delete", undefined);
+                                    }
+                                } else {
+                                    alert("게시물이 선택되어 있지 않습니다");
+                                }
+                            });
+                            $(".boardcheck").on({
+                                click: function(event) {
+                                    event.stopPropagation();
+                                }
+                                /*change: function() {
+                                    board_del_array.push($(this).parents(".board-row").data("num"));
+                                }*/
+                            });
+                            $("#checkall").change(function() {
+                                $(".boardcheck").prop('checked', this.checked);
+                                /*$(".boardcheck").prop('checked', this.checked).each(function(index, item) {
+                                    $(this).trigger("click");
+                                })*/
+                            });
+                            function submit_helper(formobj, action, method, data) {
+                                if(method == "put" || method == "delete") {
+                                    //document.createElement()
+                                    //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                                    action += "/?_method=" + method;
+                                    method = "post";
+                                }
+                                
+                                formobj.attr({"action" : action, 'method' : method});
+                                console.log(action);
+                                formobj.submit();
+                            }
+                        </script>
+                    <%}%>
+                <%}%>
+            </div>
+        </main>
+        <script>
+            $('.card').click(function() {
+                // row was clicked
+                location.href = "/stock/" + $(this).data("num");
+            });
+        </script>
+
+        <%include ../footer %>
+</body>
+
+</html>

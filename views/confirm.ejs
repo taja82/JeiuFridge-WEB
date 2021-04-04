@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        var a = confirm("<%=msg%>");
+        if (a) {
+            <%if(true_redirect != undefined) {%>
+                window.location.replace("<%=true_redirect%>");
+            <%} else {%>
+                submit_helper(undefined, "<%=true_form_action%>", "<%=true_form_method%>", <%if(true_form_data != undefined) {%>"<%=true_form_data%>"<%} else {%>undefined<%}%>);
+            <%}%>
+        }
+        else {
+            <%if(false_redirect != undefined) {%>
+                window.location.replace("<%=false_redirect%>");
+            <%} else {%>
+                submit_helper(undefined, "<%=false_form_action%>", "<%=false_form_method%>", <%if(false_form_data != undefined) {%>"<%=false_form_data%>"<%} else {%>undefined<%}%>);
+            <%}%>
+        }
+
+        function submit_helper(formobj, action, method, data) {
+            if (method == "put" || method == "delete") {
+                action += "/?_method=" + method;
+                method = "post";
+            }
+
+            //formobj.attr({ "action": action, 'method': method });
+            if(formobj == undefined) {
+                formobj = document.createElement('form');
+            }
+            
+            formobj.method = method;
+            formobj.action = action;
+
+            if (data != undefined) {
+                for (const key in data) {
+                    if (params.hasOwnProperty(key)) {
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = key;
+                        hiddenField.value = data[key];
+
+                        formobj.appendChild(hiddenField);
+                    }
+                }
+            }
+            
+            document.body.appendChild(formobj);
+            formobj.submit();
+        }
+    </script>
+</body>
+
+</html>

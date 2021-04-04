@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">글조회</h1>
+                    <table class="table">
+                        <tr>
+                            <td>
+                                <label for="title_input">제목<span class="require">*</span></label>
+                            </td>
+                            <td>
+                                <%=result.title%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="content_input">내용</label>
+                            </td>
+                            <td>
+                                <%=result.content%>
+                            </td>
+                        </tr>
+                        <%if(result.img_src != null) {%>
+                            <tr>
+                                <td>이미지</td>
+                                <td><img src="<%=result.img_src%>"/></td>
+                            </tr>
+                        <%}%>
+                    </table>
+                    <form action="/test" method="post" id="boardviewForm">
+                            <input type="button" value="수정" id="modifyBtn" class="btn btn-dark" />
+                            <input type="button" value="삭제" id="deleteBtn" class="btn btn-danger" />
+                            <script>
+                                $("#deleteBtn").click(function() {
+                                    var confirm_a = confirm("현재 게시물을 삭제합니다. 계속하시겠습니까?");
+                                    if(confirm_a) {
+                                        submit_helper($("#boardviewForm"), "/test/" + <%=result.num%>, "delete", undefined);
+                                    }
+                                });
+                                $("#modifyBtn").click(function() {
+                                    location.href = "/test/" + <%=result.num%> + "/edit";
+                                });
+                                
+                                function submit_helper(formobj, action, method, data) {
+                                    if(method == "put" || method == "delete") {
+                                        //document.createElement()
+                                        //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                                        action += "/?_method=" + method;
+                                        method = "post";
+                                    }
+                                    
+                                    formobj.attr({"action" : action, 'method' : method});
+                                    formobj.submit();
+                                }
+                            </script>
+                        <input type="button" value="목록" id="listBtn" class="btn btn-primary" />
+                    </form>
+                <script>
+                $("#listBtn").click(function() {
+                    location.href = "/test";
+                });
+                </script>
+            </div>
+        </main>
+
+        <%include ../footer %>
+
+</body>
+
+</html>

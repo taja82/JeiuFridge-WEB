@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/css/all.css"></link>
+    <title>Document</title>
+    <style>
+        .board-header {
+            color: white;
+            background-color: gray;
+
+        }
+
+        .board-body .board-row {
+            border-top: 1px solid black;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5">장바구니</h1>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <%if(user != undefined) {%>
+                                <th class="text-center" style="width:30px;">
+                                    <input type="checkbox" id="checkall">
+                                </th>
+                                <%}%>
+                                    <th scope="col" class="text-center">상품</th>
+                                    <th scope="col" class="text-center" style="width:100px;">단가</th>
+                                    <th scope="col" class="text-center" style="width:160px;">갯수</th>
+                                    <th scope="col" class="text-center" style="width:100px;">소계</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%if(result.length != 0) {%>
+                            <%for(var i=0; i<result.length;i++) {%>
+                                <tr class="board-row" <%if(result[i].count <= 0) {%> class="table-inactive" <%}%> data-num=<%=result[i].cartnum%>>
+                                    <%if(user != undefined && user.is_admin == true) {%>
+                                        <th scope="row" class="checkth"><input type="checkbox" class="boardcheck"></th>
+                                        <%}%>
+                                            <td class="">
+                                                <%if(result[i].img_src) {%>
+                                                    <img src="<%=result[i].img_src%>" style="height:50px;" />
+                                                    <%}%>
+                                                        <%=result[i].name%>
+                                            </td>
+                                            <td class="text-right price-col"><%=result[i].price%></td>
+                                            <td class="count-col">
+                                                <div class="input-group inline-group">
+                                                    <div class="input-group-prepend">
+                                                        <button type="button" class="btn btn-outline-secondary btn-minus">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </div>
+                                                    <input class="form-control quantity" min="1" max="<%=result[i].stock%>" name="quantity" value="<%=result[i].count%>" type="number" style="text-align:center;">
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-outline-secondary btn-plus">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="smallsum-col text-right">
+                                                
+                                            </td>
+                                </tr>
+                                <%}%>
+                                    <%} else {%>
+                                        <tr class="board-row">
+                                            <%if(user != undefined) {%>
+                                                <%if(user.is_admin == true) {%>
+                                                    <td colspan="5">
+                                                <%} else {%>
+                                                    <td colspan="4">
+                                                <%}%>
+                                            <%}%>
+                                            항목이 없습니다</td>
+                                        </tr>
+                                        <%}%>
+                    </tbody>
+                </table>
+                <div id="totalsum">
+                    
+                </div>
+                <form method="post" id="boardForm">
+                    <button type="button" id="buyBtn" class="btn btn-primary">구매하기</button>
+                    <button type="button" id="deleteBtn" class="btn btn-danger">삭제</button>
+                </form>
+                
+                <%if(user != undefined) {%>
+                <script>
+                    $('.btn-plus, .btn-minus').on('click', function(e) {
+                        const isNegative = $(e.target).closest('.btn-minus').is('.btn-minus');
+                        const input = $(e.target).closest('.input-group').find('input');
+                        if (input.is('input')) {
+                            input[0][isNegative ? 'stepDown' : 'stepUp']()
+                        }
+                    })
+                </script>
+                    <script>
+                    function submit_helper(formobj, action, method, data) {
+                                if(method == "put" || method == "delete") {
+                                    //document.createElement()
+                                    //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                                    action += "/?_method=" + method;
+                                    method = "post";
+                                }
+                                
+                                formobj.attr({"action" : action, 'method' : method});
+                                console.log(action);
+                                formobj.submit();
+                            }
+                            function getAllChecked() {
+                                var array = [];
+                                $(".boardcheck").each(function(index, item) {
+                                    if(item.checked == true) {
+                                        //board_del_array.push($(this).parents(".board-row").data("num"));
+                                        array.push($(this).parents(".board-row").data("num"));
+                                    }
+                                });
+                                board_del_array = array;
+                                return array;
+                            }
+                            var board_del_array = [];
+                    $("#deleteBtn").click(function() {
+                                /*var array = [];
+                                $(".boardcheck").each(function(index, item) {
+                                    if(item.checked == true) {
+                                        //board_del_array.push($(this).parents(".board-row").data("num"));
+                                        array.push($(this).parents(".board-row").data("num"));
+                                    }
+                                });
+                                board_del_array = array;*/
+                                if(getAllChecked().length != 0) {
+                                    var del_c = confirm(board_del_array.length + "개의 항목을 삭제합니다. 계속하시겠습니까?");
+                                    if(del_c) {
+                                        //$("#boardFrom").attr({"action" : "notice/array/" + board_del_array, "method": "delete"}).submit();
+                                        submit_helper($("#boardForm"), "/cart/array/" + board_del_array, "delete", undefined);
+                                    }
+                                } else {
+                                    alert("게시물이 선택되어 있지 않습니다");
+                                }
+                            });
+                        
+                        $("#checkall").change(function() {
+                                $(".boardcheck").prop('checked', this.checked);
+                                getsum();
+                                /*$(".boardcheck").prop('checked', this.checked).each(function(index, item) {
+                                    $(this).trigger("click");
+                                })*/
+                            });
+                        $(".btn-minus, .btn-plus").on('click', function() {
+                            getsum();
+                        });
+                        
+                        function getsum() {//각 합계
+                            var sum = 0;
+                            var price = 0;
+                            var count = 0;
+                            var i = 0;
+                            var total_sum = 0;
+                            var cart_count = 0;
+                            var a = $(".board-row");
+                            for(i = 0; i < a.length; i++) {//obj가 tr이 되도록 작업할것
+                                sum = 0;
+                                price = a.eq(i).children(".price-col").text();
+                                count = a.eq(i).find(".quantity").val();
+                                sum = price * count;
+                                //console.log(sum)
+                                a.eq(i).children(".smallsum-col").text(sum);
+                                if(a.eq(i).find(".boardcheck").is(":checked") == true) {
+                                    //a.eq(i).children(".smallsum-col").text()
+                                    total_sum += sum
+                                    cart_count++;
+                                }
+                                $("#totalsum").text("총 " + cart_count + "개의 상품에서 " + total_sum + "원이 나왔습니다");
+                            }
+                        }
+                        getsum();
+                        
+                        
+                        function submit_helper(formobj, action, method, data) {
+                        if (method.toLowerCase() == "put" || method.toLowerCase() == "delete") {
+                            //document.createElement()
+                            //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                            action += "/?_method=" + method;
+                            method = "post";
+                        }
+
+                        formobj.attr({ "action": action, 'method': method });
+                        formobj.submit();
+                    }
+                    
+                        $(".boardcheck").change(function() {
+                            getsum();
+                        });
+                        $(".quantity").keyup(function() {
+                            var min = parseInt($(this).attr("min")) || 0;
+                            var max = parseInt($(this).attr("max")) || 0;
+                            
+                            var val = parseInt($(this).val()) || min;
+                            $(this).val(val);
+                            if (val < min) $(this).val(min);
+                            if (val > max) $(this).val(max);
+                            
+                            getsum();
+                        });
+                        $("#buyBtn").click(function() {
+                            submit_helper($("#boardForm"), "/cart/buy/array/" + getAllChecked(), "put", undefined);
+                        });
+                    </script>
+                    <%}%>
+            </div>
+            </div>
+        </main>
+        <%include ../footer %>
+
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+        
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include ../../header_admin %>
+
+    <!-- Begin page content -->
+    <main role="main" class="flex-shrink-0">
+        <div class="container">
+            <h1 class="mt-5">유저 관리</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <%if(user != undefined && user.is_admin == true) {%>
+                                <th class="text-center" style="width:30px;">
+                                    <input type="checkbox" id="checkall">
+                                </th>
+                            <%}%>
+                        <td>순서</td>
+                        <td>학번</td>
+                        <td>아이디</td>
+                        <td>이메일</td>
+                        <td>이름</td>
+                    </tr>
+                </thead>
+                <tbody>
+                <% for(var i=0; i<result.length; i++) {%>
+                    <tr data-num="<%=result[i].num%>" <%if(result[i].id == user.id){%>class="table-inactive"%><%}%>>
+                        <%if(user != undefined && user.is_admin == true) {%>
+                            <%if(result[i].id != user.name) {%>
+                            <th scope="row" class="checkth"><input type="checkbox" class="boardcheck"></th>
+                        <%} else {%>
+                            <th scope="row"></th>
+                        <%}}%>
+                        <td><%=result[i].num%></td>
+                        <td><%=result[i].student_id%></td>
+                        <td><%=result[i].id%></td>
+                        <td><%=result[i].email%></td>
+                        <td><%=result[i].name%></td>
+                    </tr>
+                <%}%>
+                </tbody>
+            </table>
+             <%if(user != undefined) {%>
+                    <%if(user.is_admin == true) {%>
+                        <form method="post" id="boardForm">
+                            <button type="button" class="btn btn-danger" id="delete_btn">회원 탈퇴</button>
+                        </form>
+                        <script>
+                            var board_del_array = [];
+                            $("#delete_btn").click(function() {
+                                var array = [];
+                                $(".boardcheck").each(function(index, item) {
+                                    if(item.checked == true) {
+                                        //board_del_array.push($(this).parents(".board-row").data("num"));
+                                        array.push($(this).parents("tr").data("num"));
+                                    }
+                                });
+                                board_del_array = array;
+                                console.log(board_del_array);
+                                if(board_del_array.length != 0) {
+                                    var del_c = confirm(board_del_array.length + "명의 회원을 삭제합니다. 계속하시겠습니까?");
+                                    if(del_c) {
+                                        //$("#boardFrom").attr({"action" : "notice/array/" + board_del_array, "method": "delete"}).submit();
+                                        submit_helper($("#boardForm"), "/admin/user/array/" + board_del_array, "delete", undefined);
+                                    }
+                                } else {
+                                    alert("게시물이 선택되어 있지 않습니다");
+                                }
+                            });
+                            $(".boardcheck").on({
+                                click: function(event) {
+                                    event.stopPropagation();
+                                }
+                                /*change: function() {
+                                    board_del_array.push($(this).parents(".board-row").data("num"));
+                                }*/
+                            });
+                            $("#checkall").change(function() {
+                                $(".boardcheck").prop('checked', this.checked);
+                                /*$(".boardcheck").prop('checked', this.checked).each(function(index, item) {
+                                    $(this).trigger("click");
+                                })*/
+                            });
+                            function submit_helper(formobj, action, method, data) {
+                                if(method == "put" || method == "delete") {
+                                    //document.createElement()
+                                    //formobj.append("<input type='hidden' name='_method' value='" + method +"' />");
+                                    action += "/?_method=" + method;
+                                    method = "post";
+                                }
+                                
+                                formobj.attr({"action" : action, 'method' : method});
+                                console.log(action);
+                                formobj.submit();
+                            }
+                        </script>
+                    <%}%>
+                <%}%>
+        </div>
+    </main>
+    <script>
+        $('table tbody tr').not("th.checkth").click(function() {
+                // row was clicked
+                location.href = "/admin/user/" + $(this).data("num") + "/edit";
+            });
+    </script>
+
+    <%include ../../footer %>
+</body>
+
+</html>

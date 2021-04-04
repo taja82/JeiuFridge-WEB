@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <%include header %>
+
+        <!-- Begin page content -->
+        <main role="main" class="flex-shrink-0">
+            <div class="container">
+                <h1 class="mt-5"></h1>
+                <table>
+                    
+                </table>
+
+                <script src="../js/jquery.min.js"></script>
+                <script src="../javascripts/valid.js"></script>
+                <script>
+                    $("#registerBtn").click(function(e) {
+                        console.log(true);
+                        //$("#loginForm").attr("action", "./login").submit();
+                        $.ajax({
+                            url: 'api/register',
+                            type: 'get',
+                            /*data: {
+                                // 보낼 데이터
+                                username:$('#usernameField').text(),
+                                password:$('#passwordField').text()
+                            },*/
+                            data: $("#registerForm").serialize(),
+                            dataType: 'json',
+                            success: function(response) {
+                                // 성공 시 동작
+                                alert("회원가입을 성공하였습니다.");
+                                location.href = "../"
+                            },
+                            error: function(error) {
+                                // 실패 시 동작
+                                console.log(error);
+                                alert("회원가입을 실패하였습니다");
+                            },
+                            complete: function(response) {
+                                console.log(response);
+                                // 성공하든 실패하든 항상 할 동작
+                            }
+                        });
+                    });
+
+                    function makeTable(json, title_json) {
+                        var resultHtml = "";
+                        resultHtml +=
+                            `<table class="table">
+                    <thead>
+                        <tr>`;
+                        for (var key in title_json) {
+                            resultHtml +=
+                                `<th scope="col">` + title_json[key] + `</th>`;
+                        }
+                        resultHtml +=
+                            `</tr>
+                    </thead>
+                    <tbody>`;
+                        for (var i = 0; i < json.length; i++) {
+                            resultHtml +=
+                                `<tr>`;
+                            for (var keya in title_json) {
+                                if (keya == 'num') {
+                                    resultHtml +=
+                                        `<th scope="row">` + json[i][keya] + `</th>`;
+                                }
+                                else {
+                                    resultHtml +=
+                                        `<td>` + json[i][keya] + `</td>`;
+                                }
+                            }
+                            resultHtml +=
+                                `</tr>`;
+                        }
+                        resultHtml +=
+                            `</tbody>
+                </table>`;
+                        return resultHtml;
+                    }
+                </script>
+            </div>
+        </main>
+
+        <%include footer %>
+
+</body>
+
+</html>
